@@ -64,7 +64,18 @@ module Recharge
         req["Content-Type"] = "application/json"
       end
 
-      connection.start do |http|
+      request = Net::HTTP.new(ENDPOINT, PORT)
+      request.use_ssl = true
+
+      if !Recharge.debug
+        request.set_debug_output(nil)
+      else
+        request.set_debug_output(
+          Recharge.debug.is_a?(IO) ? Recharge.debug : $stderr
+        )
+      end
+
+      request.start do |http|
         res = http.request(req)
         data = res["Content-Type"] == "application/json" ? parse_json(res.body) : {}
         data["meta"] = { "id" => res["X-Request-Id"], "limit" => res["X-Recharge-Limit"] }
@@ -76,23 +87,6 @@ module Recharge
       end
     rescue Net::ReadTimeout, IOError, SocketError, SystemCallError => e
       raise ConnectionError, "connection failure: #{e}"
-    end
-
-    def connection
-      unless defined? @request
-        @request = Net::HTTP.new(ENDPOINT, PORT)
-        @request.use_ssl = true
-      end
-
-      if !Recharge.debug
-        @request.set_debug_output(nil)
-      else
-        @request.set_debug_output(
-          Recharge.debug.is_a?(IO) ? Recharge.debug : $stderr
-        )
-      end
-
-      @request
     end
 
     def parse_json(s)
