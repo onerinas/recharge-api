@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 require "class2"
 require "recharge/http_request"
@@ -8,28 +10,42 @@ class2 "Recharge", JSON.parse(<<-END) do
      {
         "id":10101,
         "address_id":178918,
+        "analytics_data": {},
         "customer_id":1438,
+        "cancellation_reason": "$$$$",
+        "cancellation_reason_comments": "",
+        "cancelled_at":"2017-02-28T20:31:29",
+        "charge_interval_frequency": "3",
         "created_at":"2017-02-28T20:31:29",
         "updated_at":"2017-02-28 20:31:29",
         "next_charge_scheduled_at":"2017-04-01T00:00:00",
         "cancelled_at":null,
+        "has_queued_charges": 1,
+        "is_skippable": true,
+        "is_swappable": true,
+        "is_prepaid": false,
+        "max_retries_reached": 0,
         "product_title":"Sumatra Coffee",
         "price":12.0,
         "quantity":1,
+        "recharge_product_id": 518676,
         "status":"ACTIVE",
         "shopify_product_id":1255183683,
         "shopify_variant_id":3844924611,
+        "sku_override": false,
         "sku":null,
         "order_interval_unit":"day",
         "order_interval_frequency":"30",
         "charge_interval_frequency":"30",
         "order_day_of_month":null,
         "order_day_of_week":null,
-        "properties": []
+        "properties": [],
+        "variant_title": "Milk - a / b"
      },
   "charge":
     {
       "address_id":178918,
+      "analytics_data": {},
       "billing_address":{
          "address1":"3030 Nebraska Avenue",
          "address2":"",
@@ -50,11 +66,13 @@ class2 "Recharge", JSON.parse(<<-END) do
       "customer_hash":null,
       "customer_id":10101,
       "first_name":"Mike",
+      "has_uncommited_changes": false,
       "id":1843,
       "last_name":"Flynn",
       "line_items":[
          {
             "grams":0,
+            "images": {},
             "price":100.0,
             "properties":[],
             "quantity":1,
@@ -67,6 +85,9 @@ class2 "Recharge", JSON.parse(<<-END) do
             "subscription_id":14562
          }
       ],
+      "note": "blah blah",
+      "note_attributes": [],
+      "processor_name": "foo",
       "processed_at":"2014-11-20T00:00:00",
       "scheduled_at":"2014-11-20T00:00:01",
       "shipments_count":null,
@@ -82,10 +103,20 @@ class2 "Recharge", JSON.parse(<<-END) do
          "province":"California",
          "zip":"90404"
       },
+      "shipping_lines": [],
       "shopify_order_id":"281223307",
       "status":"SUCCESS",
       "total_price":446.00,
-      "updated_at":"2016-09-05T09:19:29"
+      "updated_at":"2016-09-05T09:19:29",
+      "tax_lines": 0,
+      "total_discounts": "0.0",
+      "total_line_items_price": "12.00",
+      "total_price": "12.00",
+      "total_refunds": null,
+      "total_tax": 0,
+      "total_weight": 4536,
+      "transaction_id": "cch_1Du2QpJ2iqHvZRd18RyqoPvc",
+      "type": "RECURRING"
     },
   "customer":
      {
@@ -108,7 +139,10 @@ class2 "Recharge", JSON.parse(<<-END) do
         "billing_country": "United States",
         "billing_phone": "3103843698",
         "processor_type": null,
-        "status": "FOO"
+        "status": "FOO",
+        "stripe_customer_token": "123123",
+        "paypal_customer_token": "123123",
+        "braintree_customer_token": "123123"
     },
   "order": {
      "id":7271806,
@@ -130,7 +164,7 @@ class2 "Recharge", JSON.parse(<<-END) do
      "email":"mike@gmail.com",
      "payment_processor":"stripe",
      "address_is_active":1,
-     "is_prepaid":0,
+     "is_prepaid":false,
      "line_items":[
         {
            "subscription_id":10101,
@@ -168,11 +202,49 @@ class2 "Recharge", JSON.parse(<<-END) do
         "country":"United States"
      }
   },
-  "webhook":
-    {
-        "id":6,
-        "address":"https://request.in/foo",
-        "topic":"order/create"
+  "metafield": {
+    "created_at": "2018-11-05T12:59:30",
+    "description": "desc lorem ipsum",
+    "id": 15,
+    "key": "marjan",
+    "namespace": "nmsp2c",
+    "owner_id": 17868054,
+    "owner_resource": "customer",
+    "updated_at": "2018-11-05T15:48:42",
+    "value": "5",
+    "value_type": "integer"
+  },
+  "product": {
+    "collection_id": null,
+    "created_at": "2019-11-07T11:36:19",
+    "discount_amount": 15.0,
+    "discount_type": "percentage",
+    "handle": null,
+    "id": 1327844,
+    "images": {},
+    "product_id": 4354268856408,
+    "shopify_product_id": 4354268856408,
+    "subscription_defaults": {
+      "charge_interval_frequency": 4,
+      "cutoff_day_of_month": null,
+      "cutoff_day_of_week": null,
+      "expire_after_specific_number_of_charges": null,
+      "modifiable_properties": [],
+      "number_charges_until_expiration": null,
+      "order_day_of_month": 0,
+      "order_day_of_week": null,
+      "order_interval_frequency": 4,
+      "order_interval_frequency_options": [],
+      "order_interval_unit": "month",
+      "storefront_purchase_options": "subscription_only"
+    },
+    "title": "T-shirt",
+    "updated_at": "2019-11-07T14:04:52"
+  },
+  "webhook": {
+     "id":6,
+     "address":"https://request.in/foo",
+     "topic":"order/create"
   },
   "address":{
     "id":3411137,
@@ -186,6 +258,26 @@ class2 "Recharge", JSON.parse(<<-END) do
     "company":"bootstrap",
     "phone":"3103103101",
     "country":"United States"
+  },
+  "discount":{
+    "id": 3748296,
+    "code": "Discount1",
+    "value": 12.5,
+    "ends_at": "2019-12-15T00:00:00",
+    "starts_at": "2018-05-16T00:00:00",
+    "status": "enabled",
+    "usage_limit": 10,
+    "applies_to_id": null,
+    "discount_type": "percentage",
+    "applies_to": null,
+    "applies_to_resource": null,
+    "times_used": 0,
+    "duration": "usage_limit",
+    "duration_usage_limit": 10,
+    "applies_to_product_type": "ALL",
+    "created_at": "2018-04-25T14:32:39",
+    "updated_at": "2018-05-04T13:33:53",
+    "once_per_customer": false
   }
 }
 END
@@ -348,6 +440,58 @@ module Recharge
     end
   end
 
+  class Discount
+    PATH = "/discounts".freeze
+    SINGLE = "discount".freeze
+    COLLECTION = "discounts"
+
+    extend HTTPRequest::Count
+    extend HTTPRequest::Create
+    extend HTTPRequest::Delete
+    extend HTTPRequest::Get
+    extend HTTPRequest::List
+    extend HTTPRequest::Update
+
+    include Persistable
+
+    def self.count(options = nil)
+      super(convert_date_params(options, :created_at_max, :created_at_min, :date_min, :date_max))
+    end
+
+    def self.list(options = nil)
+      super(convert_date_params(options, :created_at, :created_at_max, :updated_at, :updated_at_max))
+    end
+
+    def delete
+      self.class.delete(id)
+      true
+    end
+  end
+
+  class Metafield
+    PATH = "/metafields"
+    SINGLE = "metafield"
+    COLLECTION = "metafields"
+
+    extend HTTPRequest::Count
+    extend HTTPRequest::Create
+    extend HTTPRequest::Delete
+    extend HTTPRequest::Get
+    extend HTTPRequest::List
+
+    include Persistable
+
+    def self.list(owner, options = nil)
+      raise ArgumentError, "owner resource required" if owner.nil? || owner.to_s.strip.empty?
+      super (options||{}).merge(:owner_resource => owner)
+    end
+
+    def delete
+      self.class.delete(id)
+      true
+    end
+  end
+
   class Order
     PATH = "/orders".freeze
     SINGLE = "order".freeze
@@ -371,6 +515,16 @@ module Recharge
       path = join(id, "update_shopify_variant", old_variant_id)
       instance(POST(path, :new_shopify_variant_id => new_varient_id))
     end
+  end
+
+  class Product
+    PATH = "/products".freeze
+    SINGLE = "product".freeze
+    COLLECTION = "products".freeze
+
+    extend HTTPRequest::Count
+    extend HTTPRequest::Get
+    extend HTTPRequest::List
   end
 
   class Subscription

@@ -3,8 +3,8 @@ require "uri"
 require "json"
 
 # For iso8601
-require "date"
-require "time"
+#require "date"
+#require "time"
 
 module Recharge
   module HTTPRequest # :nodoc:
@@ -56,7 +56,7 @@ module Recharge
     private
 
     def request(req, data = {})
-      req[TOKEN_HEADER] = ReCharge.api_key || ""
+      req[TOKEN_HEADER] = ReCharge.api_key || ENV["RECHARGE_API_KEY"] || ""
       req["User-Agent"] = USER_AGENT
 
       if req.request_body_permitted? && data && data.any?
@@ -64,9 +64,21 @@ module Recharge
         req["Content-Type"] = "application/json"
       end
 
-      connection.start do |http|
+      request = Net::HTTP.new(ENDPOINT, PORT)
+      request.use_ssl = true
+
+      if !Recharge.debug
+        request.set_debug_output(nil)
+      else
+        request.set_debug_output(
+          Recharge.debug.is_a?(IO) ? Recharge.debug : $stderr
+        )
+      end
+
+      request.start do |http|
         res = http.request(req)
-        data = res["Content-Type"] == "application/json" ? parse_json(res.body) : {}
+        # API returns 204 but content-type header is set to application/json so check body
+        data = res.body && res["Content-Type"] == "application/json" ? parse_json(res.body) : {}
         data["meta"] = { "id" => res["X-Request-Id"], "limit" => res["X-Recharge-Limit"] }
 
         return data if res.code[0] == "2" && !data["warning"] && !data["error"]
@@ -76,23 +88,6 @@ module Recharge
       end
     rescue Net::ReadTimeout, IOError, SocketError, SystemCallError => e
       raise ConnectionError, "connection failure: #{e}"
-    end
-
-    def connection
-      unless defined? @request
-        @request = Net::HTTP.new(ENDPOINT, PORT)
-        @request.use_ssl = true
-      end
-
-      if !Recharge.debug
-        @request.set_debug_output(nil)
-      else
-        @request.set_debug_output(
-          Recharge.debug.is_a?(IO) ? Recharge.debug : $stderr
-        )
-      end
-
-      @request
     end
 
     def parse_json(s)
@@ -185,7 +180,7 @@ module Recharge
     end
 
     #
-    # Retrieve a page of records for the included/extended class'
+    # Retrieve a page of records for the included/extended class' endpoint
     #
     # === Arguments
     #
